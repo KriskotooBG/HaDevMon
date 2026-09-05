@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/apps/" />
+  
+  <Folder Name="/apps/home-assistant-device-monitor/">
+    <Project Path="src/apps/home-assistant-device-monitor/src/HaDevMon.Server/HaDevMon.Server.csproj" Id="7949086c-4577-4c16-a165-a8e07c480249" />
+  </Folder>
+  
+  <Folder Name="/modules/" />
+  <Folder Name="/modules/device-monitoring/">
+    <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Windows/DeviceMonitoring.Windows.csproj" Id="3dd044b7-ef12-4bb4-8a94-23ea886281ba" />
+    <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Abstractions/DeviceMonitoring.Abstractions.csproj" Id="e0a565b9-af00-4e37-bb0e-f0cd6f04029e" />
+    <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Generic/DeviceMonitoring.Generic.csproj" Id="a02941f6-2da4-4046-81fd-8269cb75076e" />
+  </Folder>
+  
+  <Folder Name="/modules/hosting/">
+    <Project Path="src/modules/hosting/src/Hosting.Windows/Hosting.Windows.csproj" Id="1ec39fe9-6a74-49fe-bb94-5d2b508b1b73" />
+  </Folder>
+  
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
+</Solution>
