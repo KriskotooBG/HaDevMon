@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "HaDevMon.Server": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

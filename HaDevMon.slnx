@@ -6,10 +6,18 @@
   </Folder>
   
   <Folder Name="/modules/" />
+  
+  <Folder Name="/modules/communication/">
+    <Project Path="src/modules/communication/src/Communication.Abstractions/Communication.Abstractions.csproj" Id="0dc955c7-a6a6-475a-806c-25f7b3e62524" />
+    <Project Path="src/modules/communication/src/Communication.Mqtt/Communication.Mqtt.csproj" Id="27bf968e-407a-4eb1-b92e-2ec43fefd39e" />
+    <Project Path="src/modules/communication/src/Communication/Communication.csproj" Id="a9f8efc4-670b-4e85-a077-7e27cff11e36" />
+  </Folder>
+  
   <Folder Name="/modules/device-monitoring/">
-    <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Windows/DeviceMonitoring.Windows.csproj" Id="3dd044b7-ef12-4bb4-8a94-23ea886281ba" />
     <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Abstractions/DeviceMonitoring.Abstractions.csproj" Id="e0a565b9-af00-4e37-bb0e-f0cd6f04029e" />
     <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Generic/DeviceMonitoring.Generic.csproj" Id="a02941f6-2da4-4046-81fd-8269cb75076e" />
+    <Project Path="src/modules/device-monitoring/src/DeviceMonitoring.Windows/DeviceMonitoring.Windows.csproj" Id="3dd044b7-ef12-4bb4-8a94-23ea886281ba" />
+    <Project Path="src/modules/device-monitoring/src/DeviceMonitoring/DeviceMonitoring.csproj" Id="c9482a2a-13a3-4328-a9c5-bd6a132dbfa8" />
   </Folder>
   
   <Folder Name="/modules/hosting/">

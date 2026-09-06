@@ -14,13 +14,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\modules\communication\src\Communication.Abstractions\Communication.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\communication\src\Communication\Communication.csproj" />
     <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Abstractions\DeviceMonitoring.Abstractions.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Generic\DeviceMonitoring.Generic.csproj" />
-    <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Windows\DeviceMonitoring.Windows.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring\DeviceMonitoring.csproj" />
     <ProjectReference Include="..\..\..\..\modules\hosting\src\Hosting.Windows\Hosting.Windows.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

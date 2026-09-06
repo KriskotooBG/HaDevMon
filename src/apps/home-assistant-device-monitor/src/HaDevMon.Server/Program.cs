@@ -1,9 +1,8 @@
-﻿using DeviceMonitoring.Abstractions.Sensors;
-using DeviceMonitoring.Generic.Sensors.Uptime;
-using HaDevMon.Server;
+﻿using Communication;
+using DeviceMonitoring;
 using HaDevMon.Server.Configuration;
-using HaDevMon.Server.DependencyInjection;
 using HaDevMon.Server.Logging;
+using HaDevMon.Server.Sensors.Services;
 using Hosting.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,16 +20,28 @@ builder.Services
     .Validate(opts => !string.IsNullOrEmpty(opts.ServiceName), "Application:ServiceName must be provided.")
     .ValidateOnStart();
 
+builder.Services
+    .AddOptions<PollingOptions>()
+    .BindConfiguration(PollingOptions.SectionName)
+    .Validate(opts => 
+        opts.Fast > TimeSpan.Zero && 
+        opts.Medium > TimeSpan.Zero &&
+        opts.Slow > TimeSpan.Zero, "PollingOptions:Fast, PollingOptions:Medium, and PollingOptions:Slow must be greater than zero.")
+    .Validate(opts => 
+        opts.Fast <= opts.Medium &&
+        opts.Medium <= opts.Slow, "PollingOptions:Fast must be less than PollingOptions:Medium, and PollingOptions:Medium must be less than PollingOptions:Slow.")
+    .ValidateOnStart();
+
 var appOptions = builder.Configuration
     .GetRequiredSection(ApplicationOptions.SectionName)
     .Get<ApplicationOptions>() ?? throw new InvalidOperationException($"Missing configuration section '{ApplicationOptions.SectionName}'.");
 
-builder.Services
-    .AddIfEnabled<ISensorContributor, UptimeSensor>(builder.Configuration, "Features:Sensors:Uptime");
 
 
 builder.Services
-    .AddHostedService<HaDevMonTestWorker>();
+    .AddHostedService<SensorPollingService>()
+    .AddCommunication(builder.Configuration)
+    .AddDeviceMonitoring(builder.Configuration);
 
 
 builder.AddWindowsServiceHosting(appOptions.ServiceName);
