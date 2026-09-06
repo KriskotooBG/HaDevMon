@@ -14,9 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\DeviceMonitoring.Windows\DeviceMonitoring.Windows.csproj" />
     <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Abstractions\DeviceMonitoring.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Generic\DeviceMonitoring.Generic.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Windows\DeviceMonitoring.Windows.csproj" />
     <ProjectReference Include="..\..\..\..\modules\hosting\src\Hosting.Windows\Hosting.Windows.csproj" />
   </ItemGroup>
 
