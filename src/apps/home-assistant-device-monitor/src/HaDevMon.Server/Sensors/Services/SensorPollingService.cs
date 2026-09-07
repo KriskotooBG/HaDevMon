@@ -1,15 +1,18 @@
-﻿using HaDevMon.Server.Configuration;
+﻿using Communication.Abstractions.Client;
+using Communication.Abstractions.Models;
+using DeviceMonitoring.Abstractions.Sensors;
+using HaDevMon.Server.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using DeviceMonitoring.Abstractions.Sensors;
 
 namespace HaDevMon.Server.Sensors.Services
 {
     public sealed class SensorPollingService(
         IEnumerable<SensorRegistration> sensorRegistrations,
         IOptions<PollingOptions> pollingOptions,
+        IDeviceCommunication communication,
         ILogger<SensorPollingService> logger
     ) : BackgroundService
     {
@@ -38,12 +41,20 @@ namespace HaDevMon.Server.Sensors.Services
                 try
                 {
                     var reading = await sensor.ReadAsync(ct);
+                    logger.LogInformation("Sensor {SensorName} ({SensorKey}) = {Value} {Unit}", sensor.Name, sensor.Key, reading.Value, sensor.UnitOfMeasurement);
 
-                    logger.LogInformation("Sensor {SensorName} ({SensorKey}) = {Value} {Unit}",
-                        sensor.Name,
-                        sensor.Key,
-                        reading.Value,
-                        sensor.UnitOfMeasurement);
+                    try
+                    {
+                        await communication.PublishStateAsync(new StateUpdate(sensor.Key, reading.Value), ct);
+                    }
+                    catch (OperationCanceledException) when (ct.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    catch (Exception exception)
+                    {
+                        logger.LogError(exception, "Failed to publish state for {SensorName} ({SensorKey})", sensor.Name, sensor.Key);
+                    }
 
                     stopwatch.Stop();
                 }
