@@ -8,6 +8,8 @@ namespace Communication.Abstractions.Client
 
         Task ConnectAsync(DeviceDescriptor device, CancellationToken cancellationToken);
 
+        Task PublishStateAsync(StateUpdate state, CancellationToken cancellationToken);
+
         Task DisconnectAsync(CancellationToken cancellationToken);
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Protocol;
+using System.Globalization;
 
 namespace Communication.Mqtt.Client
 {
@@ -18,7 +19,13 @@ namespace Communication.Mqtt.Client
         private readonly ILogger<MqttDeviceCommunication> _logger;
         private readonly IMqttClient _client;
 
+        private DeviceDescriptor? _device;
+
         private string? _availabilityTopic;
+
+        private readonly object _connectionSync = new();
+        private TaskCompletionSource<bool> _connectedSignal = CreateConnectionSignal();
+
 
 
         public bool IsConnected => _client.IsConnected;
@@ -32,8 +39,19 @@ namespace Communication.Mqtt.Client
 
             _client = new MqttClientFactory().CreateMqttClient();
 
+            _client.ConnectedAsync += _ =>
+            {
+                MarkConnected();
+
+                _logger.LogDebug("MQTT connection marked as ready");
+                return Task.CompletedTask;
+            };
+
+
             _client.DisconnectedAsync += _ =>
             {
+                MarkDisconnected();
+
                 _logger.LogWarning("Disconnected from MQTT broker");
                 return Task.CompletedTask;
             };
@@ -47,6 +65,7 @@ namespace Communication.Mqtt.Client
 
             if (_client.IsConnected) return;
 
+            _device = device;
             _availabilityTopic = BuildAvailabilityTopic(device);
 
             var optionsBuilder = new MqttClientOptionsBuilder()
@@ -73,18 +92,27 @@ namespace Communication.Mqtt.Client
             await PublishAvailabilityAsync(OnlinePayload, cancellationToken);
         }
 
-        public async Task DisconnectAsync(CancellationToken cancellationToken)
+        public async Task PublishStateAsync(StateUpdate state, CancellationToken cancellationToken)
         {
-            if (!_client.IsConnected) return;
+            ArgumentNullException.ThrowIfNull(state);
 
-            // A clean MQTT disconnect does not trigger the LWT, so explicitly publish offline first.
-            await PublishAvailabilityAsync(OfflinePayload, cancellationToken);
-            await _client.DisconnectAsync(cancellationToken: cancellationToken);
+            if (_device is null)
+                throw new InvalidOperationException("MQTT device has not been initialized.");
 
-            _logger.LogInformation("Disconnected cleanly from MQTT broker");
+            await WaitUntilConnectedAsync(cancellationToken);
+
+            var topic = BuildStateTopic(_device,state.Key);
+            var payload = FormatPayload(state.Value);
+
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+                .WithRetainFlag()
+                .Build();
+
+            await _client.PublishAsync(message, cancellationToken);
         }
-
-        public void Dispose() => _client.Dispose();
 
         private async Task PublishAvailabilityAsync(string payload, CancellationToken cancellationToken)
         {
@@ -102,10 +130,79 @@ namespace Communication.Mqtt.Client
             _logger.LogInformation("Published MQTT availability: {Availability}", payload);
         }
 
+        public async Task DisconnectAsync(CancellationToken cancellationToken)
+        {
+            if (!_client.IsConnected) return;
+
+            // A clean MQTT disconnect does not trigger the LWT, so explicitly publish offline first.
+            await PublishAvailabilityAsync(OfflinePayload, cancellationToken);
+            await _client.DisconnectAsync(cancellationToken: cancellationToken);
+
+            _logger.LogInformation("Disconnected cleanly from MQTT broker");
+        }
+
+        public void Dispose() => _client.Dispose();
+
+        private static TaskCompletionSource<bool> CreateConnectionSignal()
+            => new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        private void MarkConnected()
+        {
+            lock (_connectionSync)
+            {
+                _connectedSignal.TrySetResult(true);
+            }
+        }
+
+        private void MarkDisconnected()
+        {
+            lock (_connectionSync)
+            {
+                if (_connectedSignal.Task.IsCompleted)
+                    _connectedSignal = CreateConnectionSignal();
+            }
+        }
+
+        private Task WaitUntilConnectedAsync(CancellationToken cancellationToken)
+        {
+            if (_client.IsConnected)
+                return Task.CompletedTask;
+            
+            Task connectionTask;
+
+            lock (_connectionSync)
+            {
+                if (_client.IsConnected)
+                    return Task.CompletedTask;
+
+                connectionTask = _connectedSignal.Task;
+            }
+
+            return connectionTask.WaitAsync(cancellationToken);
+        }
+
         private string BuildAvailabilityTopic(DeviceDescriptor device)
         {
             var baseTopic = _options.BaseTopic.Trim().Trim('/');
             return $"{baseTopic}/{device.Id}/availability";
+        }
+
+        private string BuildStateTopic(DeviceDescriptor device, string key)
+        {
+            var baseTopic = _options.BaseTopic.Trim().Trim('/');
+            return $"{baseTopic}/{device.Id}/state/{key}";
+        }
+
+        private static string FormatPayload(object? value)
+        {
+            return value switch
+            {
+                null => string.Empty,
+                bool boolean => boolean ? "true" : "false",
+                IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture) ?? string.Empty,
+
+                _ => value.ToString() ?? string.Empty
+            };
         }
     }
 }
