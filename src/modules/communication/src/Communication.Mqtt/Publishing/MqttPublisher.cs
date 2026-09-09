@@ -3,7 +3,7 @@ using MQTTnet.Protocol;
 
 namespace Communication.Mqtt.Publishing
 {
-    public sealed class MqttPublisher(IMqttClient client)
+    internal sealed class MqttPublisher(IMqttClient client)
     {
         public async Task PublishRetainedAsync(string topic, string payload, CancellationToken cancellationToken)
         {

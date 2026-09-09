@@ -1,15 +1,21 @@
 ﻿using Communication.Abstractions.Client;
+using Communication.Abstractions.Commands;
+using Communication.Abstractions.Entities;
 using Communication.Abstractions.Models;
+using Communication.Mqtt.Commands;
 using Communication.Mqtt.Connection;
+using Communication.Mqtt.Discovery;
 using Communication.Mqtt.Publishing;
 
 namespace Communication.Mqtt.Client
 {
-    public sealed class MqttDeviceCommunication(
+    internal sealed class MqttDeviceCommunication(
         MqttConnection connection,
         MqttPublisher publisher,
-        MqttTopicBuilder topics
-    ): IDeviceCommunication
+        MqttTopicBuilder topics,
+        HomeAssistantDiscoveryCoordinator discoveryCoordinator,
+        MqttCommandReceiver commandReceiver
+    ) : IDeviceCommunication
     {
         public bool IsConnected => connection.IsConnected;
 
@@ -20,6 +26,12 @@ namespace Communication.Mqtt.Client
 
         public Task DisconnectAsync(CancellationToken cancellationToken)
             => connection.DisconnectAsync(cancellationToken);
+
+        public Task RegisterEntitiesAsync(IReadOnlyCollection<EntityDescriptor> entities, CancellationToken cancellationToken)
+            => discoveryCoordinator.RegisterEntitiesAsync(entities, cancellationToken);
+
+        public IAsyncEnumerable<CommandInvocation>ReadCommandsAsync(CancellationToken cancellationToken)
+            => commandReceiver.ReadAllAsync(cancellationToken);
 
         public async Task PublishStateAsync(StateUpdate state, CancellationToken cancellationToken)
         {

@@ -1,4 +1,5 @@
-﻿using DeviceMonitoring.Abstractions.Configuration;
+﻿using DeviceMonitoring.Abstractions.Commands;
+using DeviceMonitoring.Abstractions.Configuration;
 using DeviceMonitoring.Abstractions.Sensors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,28 @@ namespace DeviceMonitoring.Extensions
                 
                     return new SensorRegistration(sensor, featureOptions.UpdateInterval);
                 });
+
+            return services;
+        }
+
+        internal static IServiceCollection AddCommandIfEnabled<TImplementation, TOptions>(
+            this IServiceCollection services,
+            IConfigurationSection section
+        ) where TImplementation : class, ICommandContributor where TOptions : CommandFeatureOptions
+        {
+            var options = section.Get<TOptions>();
+
+            if (options is null || !options.Enabled)
+                return services;
+        
+
+            services
+                .AddOptions<TOptions>()
+                .Bind(section);
+
+            services
+                .AddSingleton<TImplementation>()
+                .AddSingleton(sp => new CommandRegistration(sp.GetRequiredService<TImplementation>()));
 
             return services;
         }

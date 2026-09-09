@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Communication.Mqtt.Connection
 {
-    public sealed class MqttAvailabilityPublisher(
+    internal sealed class MqttAvailabilityPublisher(
         MqttPublisher publisher,
         MqttTopicBuilder topics,
         ILogger<MqttAvailabilityPublisher> logger

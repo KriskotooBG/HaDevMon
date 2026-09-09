@@ -69,7 +69,11 @@ namespace HaDevMon.Server.Sensors.Services
 
                 try
                 {
-                    await Task.Delay(interval - stopwatch.Elapsed, ct);
+                    var delay = interval - stopwatch.Elapsed;
+                    if(delay < TimeSpan.Zero)
+                        delay = TimeSpan.Zero;
+
+                    await Task.Delay(delay, ct);
                 }
                 catch (OperationCanceledException) when (ct.IsCancellationRequested)
                 { 

@@ -8,7 +8,7 @@ using MQTTnet.Protocol;
 
 namespace Communication.Mqtt.Connection
 {
-    public class MqttClientOptionsFactory(
+    internal class MqttClientOptionsFactory(
         IOptions<MqttOptions> options,
         MqttTopicBuilder topics
     )

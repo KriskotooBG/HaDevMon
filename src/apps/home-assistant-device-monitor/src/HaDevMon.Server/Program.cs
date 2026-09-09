@@ -1,6 +1,8 @@
 ﻿using Communication;
 using DeviceMonitoring;
+using HaDevMon.Server.Commands.Services;
 using HaDevMon.Server.Configuration;
+using HaDevMon.Server.Devices.Services;
 using HaDevMon.Server.Logging;
 using HaDevMon.Server.Sensors.Services;
 using Hosting.Windows;
@@ -40,6 +42,8 @@ var appOptions = builder.Configuration
 
 builder.Services
     .AddHostedService<SensorPollingService>()
+    .AddHostedService<DeviceRegistrationService>()
+    .AddHostedService<CommandExecutionService>()
     .AddCommunication(builder.Configuration)
     .AddDeviceMonitoring(builder.Configuration);
 

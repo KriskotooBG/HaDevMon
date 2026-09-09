@@ -6,7 +6,7 @@ using MQTTnet;
 
 namespace Communication.Mqtt.Connection
 {
-    public sealed class MqttConnection
+    internal sealed class MqttConnection
     {
         private readonly IMqttClient _client;
         private readonly MqttOptions _options;
@@ -27,6 +27,10 @@ namespace Communication.Mqtt.Connection
 
         public DeviceDescriptor? Device { get; private set; }
         public bool IsConnected => _client.IsConnected && _ready.IsSet;
+
+
+
+        public event Func<CancellationToken, Task>? ConnectionReadyAsync;
 
 
 
@@ -158,6 +162,8 @@ namespace Communication.Mqtt.Connection
 
                 await _availabilityPublisher.PublishOnlineAsync(device, cancellationToken);
                 _ready.Set();
+
+                await NotifyConnectionReadyAsync(cancellationToken);
             }
             finally
             {
@@ -212,6 +218,32 @@ namespace Communication.Mqtt.Connection
         {
             var delay = Math.Min(currentDelay.TotalMilliseconds * 2, _options.ReconnectMaxDelay.TotalMilliseconds);
             return TimeSpan.FromMilliseconds(delay);
+        }
+
+        private async Task NotifyConnectionReadyAsync(CancellationToken cancellationToken)
+        {
+            var handlers = ConnectionReadyAsync?
+                .GetInvocationList()
+                .Cast<Func<CancellationToken, Task>>()
+                .ToArray();
+
+            if (handlers is null) return;
+
+            foreach (var handler in handlers)
+            {
+                try
+                {
+                    await handler(cancellationToken);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogWarning(exception, "MQTT connection-ready handler failed.");
+                }
+            }
         }
     }
 }
