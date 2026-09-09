@@ -1,4 +1,4 @@
-﻿namespace Communication.Abstractions.Configuration
+﻿namespace Communication.Mqtt.Configuration
 {
     public sealed class MqttOptions
     {
@@ -17,5 +17,9 @@
         public string DiscoveryPrefix { get; init; } = "homeassistant";
 
         public TimeSpan KeepAlive { get; init; } = TimeSpan.FromSeconds(30);
+
+        public TimeSpan ReconnectInitialDelay { get; init; } = TimeSpan.FromSeconds(1);
+
+        public TimeSpan ReconnectMaxDelay { get; init; } = TimeSpan.FromSeconds(30);
     }
 }
