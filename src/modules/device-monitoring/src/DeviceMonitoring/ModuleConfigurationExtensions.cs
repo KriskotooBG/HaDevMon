@@ -1,10 +1,11 @@
 ﻿using DeviceMonitoring.Extensions;
 using DeviceMonitoring.Generic.Sensors.Uptime;
-using DeviceMonitoring.Windows;
+using DeviceMonitoring.Windows.Sensors.MemoryUsage;
 using DeviceMonitoring.Windows.Commands.Restart;
 using DeviceMonitoring.Windows.Commands.Shutdown;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using DeviceMonitoring.Windows.Sensors.CpuUsage;
 
 namespace DeviceMonitoring
 {
@@ -19,7 +20,9 @@ namespace DeviceMonitoring
             var commands = section.GetRequiredSection("Commands");
 
             services
-                .AddSensorIfEnabled<UptimeSensor, UptimeOptions>(sensors.GetRequiredSection("Uptime"));
+                .AddSensorIfEnabled<UptimeSensor, UptimeOptions>(sensors.GetRequiredSection("Uptime"))
+                .AddSensorIfEnabled<MemoryUsageSensor, MemoryUsageOptions>(sensors.GetRequiredSection("MemoryUsage"))
+                .AddSensorIfEnabled<CpuUsageSensor, CpuUsageOptions>(sensors.GetRequiredSection("CpuUsage"));
 
             services
                 .AddCommandIfEnabled<ShutdownCommand, ShutdownOptions>(commands.GetRequiredSection("Shutdown"))
