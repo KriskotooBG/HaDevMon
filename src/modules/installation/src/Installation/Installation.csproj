@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Installation.Abstractions\Installation.Abstractions.csproj" />
+    <ProjectReference Include="..\Installation.Linux\Installation.Linux.csproj" />
+    <ProjectReference Include="..\Installation.Windows\Installation.Windows.csproj" />
+  </ItemGroup>
+
+</Project>

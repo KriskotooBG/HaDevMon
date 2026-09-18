@@ -23,8 +23,15 @@
   <Folder Name="/modules/hosting/">
     <Project Path="src/modules/hosting/src/Hosting.Windows/Hosting.Windows.csproj" Id="1ec39fe9-6a74-49fe-bb94-5d2b508b1b73" />
   </Folder>
+  <Folder Name="/modules/installation/">
+    <Project Path="src/modules/installation/src/Installation.Abstractions/Installation.Abstractions.csproj" Id="113ca7a6-15c0-45b3-b0d7-f8f20e39e952" />
+    <Project Path="src/modules/installation/src/Installation.Linux/Installation.Linux.csproj" Id="d576466a-82e9-4f2f-90b0-f3ecd7326f68" />
+    <Project Path="src/modules/installation/src/Installation.Windows/Installation.Windows.csproj" Id="5603ea8e-b5a5-4ebe-93b1-01c6724a340d" />
+    <Project Path="src/modules/installation/src/Installation/Installation.csproj" Id="9007148f-0951-4c9e-8ac9-808d7e3b2700" />
+  </Folder>
   
   <Folder Name="/Solution Items/">
+    <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
 </Solution>
