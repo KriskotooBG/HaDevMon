@@ -7,7 +7,13 @@
 	<OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+	<Version>0.1.0</Version>
+	<AssemblyVersion>0.1.0.0</AssemblyVersion>
+	<FileVersion>0.1.0.0</FileVersion>
+  </PropertyGroup>
+
+	<ItemGroup>
     <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
@@ -19,6 +25,7 @@
     <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring.Abstractions\DeviceMonitoring.Abstractions.csproj" />
     <ProjectReference Include="..\..\..\..\modules\device-monitoring\src\DeviceMonitoring\DeviceMonitoring.csproj" />
     <ProjectReference Include="..\..\..\..\modules\hosting\src\Hosting.Windows\Hosting.Windows.csproj" />
+    <ProjectReference Include="..\..\..\..\modules\installation\src\Installation\Installation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

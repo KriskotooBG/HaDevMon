@@ -5,10 +5,33 @@ using HaDevMon.Server.Configuration;
 using HaDevMon.Server.Devices.Services;
 using HaDevMon.Server.Logging;
 using HaDevMon.Server.Sensors.Services;
+using HaDevMon.Server.SetupWizard;
 using Hosting.Windows;
+using Installation.Abstractions.Service.Models;
+using Installation.Bootstrap;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+
+var executableName = "HaDevMon.Server.exe";
+var programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+var installPath = Path.Combine(programFiles, "HaDevMon.Server");
+
+var appConfig = new ServiceConfiguration(
+    Name: "HaDevMon",
+    Description: "Home Assistant Device Monitor",
+    InstallationPath: installPath,
+    ExecutableName: executableName,
+    Arguments: "--service"
+);
+
+var installation =  await InstallationBootstrap.RunAsync(args, appConfig, SetupConfigurationDefinition.Fields);
+if (!installation.ShouldRunApplication)
+{
+    Environment.ExitCode = installation.ExitCode;
+    return;
+}
 
 
 var builder = Host.CreateApplicationBuilder(args);
